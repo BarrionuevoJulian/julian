@@ -1,0 +1,6 @@
+{
+    "sketch": "Ej_1.ino",
+    "output": "build",
+    "board": "arduino:avr:uno",
+    "programmer": "arduino:avrispmkii"
+}
