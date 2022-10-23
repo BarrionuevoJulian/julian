@@ -33,4 +33,12 @@ void loop()
 void mef(char led, int pulsador)
 {
     static char ESTADO = inicial;
+
+    if (ESTADO == inicial)
+    {
+        pinMode(led, OUTPUT);
+        ESTADO = prendido;
+        digitalWrite(led, HIGH);
+    }
+    
 }
