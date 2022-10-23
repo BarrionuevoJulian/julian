@@ -4,6 +4,12 @@
 #define LED LED_BUILTIN
 #define PULSADOR 3 // pin 3
 
+uint8_t lectura = 0xFF; // igual a 0b11111111
+int ciclo = 0;
+bool cambio = false, anterior_cam = false;
+
+#define CICLO 7 // cada cuanto se leera el boton
+
 enum ESTADO
 {
     inicial,
@@ -40,37 +46,26 @@ void mef(char led, int pulsador)
         ESTADO = prendido;
         digitalWrite(led, HIGH);
     }
-
+    if(ciclo > CICLO){  //Lecturas del pulsador
+        lectura = lectura << 1;  // Mover de lugar el bit
+        if (digitalRead(led) != 0){
+            lectura = lectura + 1;
+        }
+        if(lectura == 0){
+            cambio = false;
+        }
+        else if(lectura == 0xFF){  // otra forma de poner 0b11111111
+            cambio = true;            
+        }
+        if(cambio < anterior_cam){
+            digitalWrite(led, !digitalRead(led));
+            /*
+            if (ESTADO == apagado) ESTADO = prendido;
+            else ESTADO = apagado; 
+            */
+        }
+        anterior_cam = cambio;
+        ciclo = 0;
+    }
+    ciclo++;
 }
-
-/*
-
-if (millis >= led_lm)
-        {
-            gpio_toggle(GPIOB, GPIO11);
-            led_lm = millis + 500;
-        }
-        if (millis >= puls_lm)  
-        {
-            //  acumulo la última lectura y descarto la más vieja:
-            puls_est = puls_est << 1;
-            // leo el estado del pulsador:
-            if (gpio_get(GPIOB, GPIO9) != GPIO9)
-                puls_est = puls_est | 1;
-            // verifico si hubo 8 lecturas iguales
-            if (puls_est == 0b00000000)
-                estado_actual = 0;
-            else if (puls_est == 0b11111111)
-                estado_actual = 1;
-            // detección del flanco:
-            if (estado_actual > estado_anterior)
-            {
-                gpio_toggle(GPIOB, GPIO12);
-            }
-            // el proximo anterior es el actual:
-            estado_anterior = estado_actual;
-            // ejecuto denuevo el testeo en 7ms
-            puls_lm = millis + 7;
-        }
-
-*/
