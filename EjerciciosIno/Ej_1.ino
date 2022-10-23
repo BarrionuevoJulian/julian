@@ -76,4 +76,9 @@ void mef(char led, int repite)
 // git push // para subir el archivo a github
 // git pull // traer los cambios de github a local
 
+// git tag (nombre tag) -m "(info)"
+// git push --tags // para guardar la version/tag a github
+
+// git clone // para clonar
+
 /* https://github.com/BarrionuevoJulian/julian.git */
