@@ -69,4 +69,10 @@ void mef(char led, int repite)
 
 ////////////////////////////////////////////////////////
 
+/*
+
+estancia
+
+*/
+
 /* https://github.com/BarrionuevoJulian/julian.git */
