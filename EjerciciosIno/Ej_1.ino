@@ -67,12 +67,13 @@ void mef(char led, int repite)
         contador--;
 }
 
-////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
 
-/*
-
-estancia
-
-*/
+// git add
+// git commit -m
+// git status -s
+// git log --oneline
+// git push // para subir el archivo a github
+// git pull // traer los cambios de github a local
 
 /* https://github.com/BarrionuevoJulian/julian.git */
