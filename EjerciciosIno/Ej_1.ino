@@ -81,4 +81,8 @@ void mef(char led, int repite)
 
 // git clone // para clonar
 
+// git branch (nombre de nueva rama)
+// git branch // para ver el estado de las ramas
+// git checkout (n de la rama a ir)
+
 /* https://github.com/BarrionuevoJulian/julian.git */
