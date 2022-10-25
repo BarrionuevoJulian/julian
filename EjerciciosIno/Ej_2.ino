@@ -25,10 +25,7 @@ enum ESTADO
  */
 void mef(char led, int pulsador);
 
-void setup()
-{
-    
-}
+void setup(){}
 
 void loop()
 {
@@ -39,16 +36,21 @@ void loop()
 void mef(char led, int pulsador)
 {
     static char ESTADO = inicial;
-
+//----------------------------------------------------- inicial ---
     if (ESTADO == inicial)
     {
         pinMode(led, OUTPUT);
         ESTADO = prendido;
         digitalWrite(led, HIGH);
     }
+//----------------------------------------------------- prendido ---
+    if (ESTADO == prendido) digitalWrite(led,HIGH);
+//----------------------------------------------------- apagado ---
+    if (ESTADO == apagado)  digitalWrite(led, LOW);
+//----------------------------------------------------- lectura ---
     if(ciclo > CICLO){  //Lecturas del pulsador
         lectura = lectura << 1;  // Mover de lugar el bit
-        if (digitalRead(led) != 0){
+        if (digitalRead(pulsador) != 0){
             lectura = lectura + 1;
         }
         if(lectura == 0){
@@ -58,14 +60,12 @@ void mef(char led, int pulsador)
             cambio = true;            
         }
         if(cambio < anterior_cam){
-            digitalWrite(led, !digitalRead(led));
-            /*
+            // digitalWrite(led, !digitalRead(led));
             if (ESTADO == apagado) ESTADO = prendido;
             else ESTADO = apagado; 
-            */
         }
         anterior_cam = cambio;
         ciclo = 0;
     }
-    ciclo++;
+    ciclo++;   
 }

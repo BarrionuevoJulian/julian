@@ -1,5 +1,7 @@
 #include <Arduino.h>
-#define LED LED_BUILTIN
+#define LED_1 2
+#define LED_2 3
+#define LED_3 4
 
 enum ESTADO
 {
@@ -23,7 +25,9 @@ void setup()
 // the loop function runs over and over again forever
 void loop()
 {
-    mef(LED, 500);
+    mef(LED_1, 500);
+    mef(LED_2,  50);
+    mef(LED_3,   5);
     delay(1);
 }
 
@@ -31,7 +35,6 @@ void mef(char led, int repite)
 {
     static int contador = repite;
     static char ESTADO = inicial;
-
 //----------------------------------------------------- inicial ---
     if (ESTADO == inicial)
     {
@@ -57,26 +60,3 @@ void mef(char led, int repite)
     }
     if (ESTADO == prendido)contador--;
 }
-
-//////////////////////////////////////////////////////
-
-// git add
-// git commit -m
-// git status -s
-// git log --oneline
-// git push // para subir el archivo a github
-// git pull // traer los cambios de github a local
-
-// git tag (nombre tag) -m "(info)"
-// git push --tags // para guardar la version/tag a github
-
-// git clone // para clonar
-
-// git branch "(nombre de nueva rama)"
-// git branch // para ver el estado de las ramas
-// git branch -d (n de la rama a eliminar)
-// git checkout (n de la rama a ir)
-
-// git merge (n de la rama a fusionar) // desde master se hace 
-
-/* https://github.com/BarrionuevoJulian/julian.git */
