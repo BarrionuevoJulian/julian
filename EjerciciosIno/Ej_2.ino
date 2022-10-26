@@ -6,7 +6,6 @@
 
 uint8_t lectura = 0xFF; // igual a 0b11111111
 int ciclo = 0;
-bool cambio = false, anterior_cam = false;
 
 #define CICLO 7 // cada cuanto se leera el boton
 
@@ -14,7 +13,7 @@ enum ESTADO
 {
     inicial,
     prendido,
-    apagado
+    apagado,
 };
 
 /**
@@ -29,43 +28,62 @@ void setup(){}
 
 void loop()
 {
-    mef(LED, PULSADOR);
+	bool pulsador = lectura (PULSADOR);
+    mef(LED, pulsador);
     delay(1);
 }
 
-void mef(char led, int pulsador)
+void mef(char led, bool cambio)
 {
     static char ESTADO = inicial;
 //----------------------------------------------------- inicial ---
     if (ESTADO == inicial)
     {
         pinMode(led, OUTPUT);
-        ESTADO = prendido;
+        ESTADO = apagado;
         digitalWrite(led, HIGH);
     }
 //----------------------------------------------------- prendido ---
-    if (ESTADO == prendido) digitalWrite(led,HIGH);
+    if (ESTADO == prendido) {
+		digitalWrite(led,HIGH);
+	}
 //----------------------------------------------------- apagado ---
-    if (ESTADO == apagado)  digitalWrite(led, LOW);
-//----------------------------------------------------- lectura ---
-    if(ciclo > CICLO){  //Lecturas del pulsador
-        lectura = lectura << 1;  // Mover de lugar el bit
-        if (digitalRead(pulsador) != 0){
-            lectura = lectura + 1;
-        }
-        if(lectura == 0){
-            cambio = false;
-        }
-        else if(lectura == 0xFF){  // otra forma de poner 0b11111111
-            cambio = true;            
-        }
-        if(cambio < anterior_cam){
-            // digitalWrite(led, !digitalRead(led));
-            if (ESTADO == apagado) ESTADO = prendido;
-            else ESTADO = apagado; 
-        }
-        anterior_cam = cambio;
-        ciclo = 0;
-    }
-    ciclo++;   
+    if (ESTADO == apagado) {
+		 digitalWrite(led, LOW);
+	}
+//-----------------------------------------------------------------
+	if (cambio) ESTADO = prendido;
+	else ESTADO = apagado; 
+}
+
+bool lectura(char pulsador)
+{
+	static bool cambio = false, anterior_cam = false;
+	static bool fin = false;
+	static bool est = false;
+	
+	if (ciclo > CICLO){  //Lecturas del pulsador
+		lectura = lectura << 1;  // Mover de lugar el bit
+		if (digitalRead(pulsador) != 0){
+			lectura = lectura + 1;
+		}
+		if(lectura == 0){
+			cambio = false;
+		}
+		else if(lectura == 0xFF){  // otra forma de poner 0b11111111
+			cambio = true;
+		}
+		if(cambio < anterior_cam){
+			// digitalWrite(led, !digitalRead(led));
+			fin = true;
+		}
+		anterior_cam = cambio;
+		ciclo = 0;
+	}
+	ciclo++;
+	
+	if (fin){
+		fin = false;
+		return est =! est;
+	}
 }
