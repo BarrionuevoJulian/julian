@@ -80,7 +80,6 @@ bool lectura(char pulsador)
 		anterior_cam = cambio;
 		ciclo = 0;
 	}
-	ciclo++;
 	
 	if (fin){
 		fin = false;

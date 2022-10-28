@@ -60,6 +60,4 @@ void brilloLeds( char led , int brillo )
 	}
     // contador vuelve a resetear el periodo
     if(contador > 10) contador = 0;
-	
-    contador++;
 }
