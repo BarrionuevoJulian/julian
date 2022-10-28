@@ -48,6 +48,7 @@ void brilloLeds( char led , int brillo )
 			ESTADO = apagado;
             bandera = false;
 		}
+        contador++;
 	}
 //----------------------------------------------------- apagado ---
 	if (ESTADO == apagado){
@@ -57,6 +58,7 @@ void brilloLeds( char led , int brillo )
 			ESTADO = prendido;
 			bandera = true;
 		}
+        contador++;
 	}
     // contador vuelve a resetear el periodo
     if(contador > 10) contador = 0;

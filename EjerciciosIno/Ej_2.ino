@@ -4,16 +4,18 @@
 #define LED LED_BUILTIN
 #define PULSADOR 3 // pin 3
 
-uint8_t lectura = 0xFF; // igual a 0b11111111
-int ciclo = 0;
-
-#define CICLO 7 // cada cuanto se leera el boton
-
-enum ESTADO
+enum EST
 {
     inicial,
     prendido,
-    apagado,
+    apagado
+};
+
+enum LEC
+{
+    conteo,
+    muestreo,
+    retorno
 };
 
 /**
@@ -23,46 +25,69 @@ enum ESTADO
  * @param repite Tiempo pren/apagado
  */
 void mef(char led, int pulsador);
+bool pulsoToggle(char pulsador);
 
 void setup(){}
 
 void loop()
 {
-	bool pulsador = lectura (PULSADOR);
+	bool pulsador = pulsoToggle (PULSADOR);
     mef(LED, pulsador);
     delay(1);
 }
 
 void mef(char led, bool cambio)
 {
-    static char ESTADO = inicial;
+    static char EST = inicial;
 //----------------------------------------------------- inicial ---
-    if (ESTADO == inicial)
+    if (EST == inicial)
     {
         pinMode(led, OUTPUT);
-        ESTADO = apagado;
+        EST = apagado;
         digitalWrite(led, HIGH);
     }
 //----------------------------------------------------- prendido ---
-    if (ESTADO == prendido) {
+    if (EST == prendido) {
 		digitalWrite(led,HIGH);
 	}
 //----------------------------------------------------- apagado ---
-    if (ESTADO == apagado) {
+    if (EST == apagado) {
 		 digitalWrite(led, LOW);
 	}
 //-----------------------------------------------------------------
-	if (cambio) ESTADO = prendido;
-	else ESTADO = apagado; 
+	if (cambio) EST = prendido;
+	else EST = apagado; 
 }
 
-bool lectura(char pulsador)
+#define CICLO 7 // cada cuanto se leera el boton
+
+uint8_t lectura = 0xFF; // igual a 0b11111111
+int ciclo = 0;
+
+/**
+ * @brief Lee pulsador y togglea valor de su función cuando se presiona el mismo.
+ * muestro del mismo cada CICLOS ms.
+ * 
+ * @param pulsador Pin del pulsador
+ * @return true 
+ * @return false 
+ */
+bool pulsoToggle(char pulsador)
 {
-	static bool cambio = false, anterior_cam = false;
-	static bool fin = false;
-	static bool est = false;
+	static char LEC = conteo;
+
+	static uint8_t lectura = 0xFF;      // igual a 0b11111111
+	static int ciclo = 0;
+	static bool valorDevuelto = false;
 	
-	if (ciclo > CICLO){  //Lecturas del pulsador
+	static bool cambio = false, anterior_cam = false;
+	
+	if (LEC == conteo) ciclo++;
+	
+	if (LEC == conteo && ciclo > CICLO) LEC = muestreo;
+
+	if (LEC == muestreo)
+	{
 		lectura = lectura << 1;  // Mover de lugar el bit
 		if (digitalRead(pulsador) != 0){
 			lectura = lectura + 1;
@@ -75,14 +100,14 @@ bool lectura(char pulsador)
 		}
 		if(cambio < anterior_cam){
 			// digitalWrite(led, !digitalRead(led));
-			fin = true;
+			LEC = retorno;
 		}
 		anterior_cam = cambio;
 		ciclo = 0;
 	}
-	
-	if (fin){
-		fin = false;
-		return est =! est;
+
+	if (LEC == retorno){
+		LEC = conteo;
+		return valorDevuelto = !valorDevuelto;
 	}
 }
