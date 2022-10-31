@@ -146,11 +146,11 @@ void mef_2(char led, int repite)                                     //CONTROL F
 
 enum LEC_1                                                        //ANTIREBOTE PUL 1
 {
-  config,
-  conteo,
-  muestreo,
-  retorno_true,
-  retorno_false
+  config_1,
+  conteo_1,
+  muestreo_1,
+  retorno_true_1,
+  retorno_false_1
 };
 
 #define CICLO 5 // cada cuanto se leera el boton
@@ -165,24 +165,24 @@ enum LEC_1                                                        //ANTIREBOTE P
 */
 bool AntiRebotePulso(char pull)
 {
-  static char LEC_1 = config;
+  static char LEC_1 = config_1;
 
   static uint8_t lectura = 0x00;  // igual a 0b00000000
   static int ciclo = 0;
   static bool valorDevuelto = false;
 
   static bool cambio = false, anterior_cam = false;
-  //----------------------------------------------------- config ----
-  if (LEC_1 == config) {
+  //----------------------------------------------------- config_1 ----
+  if (LEC_1 == config_1) {
     pinMode(pull, INPUT_PULLUP);
     digitalWrite(pull, HIGH);
-    LEC_1 = conteo;
+    LEC_1 = conteo_1;
   }
-  //----------------------------------------------------- conteo -----
-  if (LEC_1 == conteo) ciclo++;
-  if (LEC_1 == conteo && ciclo > CICLO) LEC_1 = muestreo;
-  //----------------------------------------------------- muestreo ---
-  if (LEC_1 == muestreo)
+  //----------------------------------------------------- conteo_1 -----
+  if (LEC_1 == conteo_1) ciclo++;
+  if (LEC_1 == conteo_1 && ciclo > CICLO) LEC_1 = muestreo_1;
+  //----------------------------------------------------- muestreo_1 ---
+  if (LEC_1 == muestreo_1)
   {
     lectura = lectura << 1;  // Mover de lugar el bit
     if (digitalRead(pull) == 0) {
@@ -190,29 +190,29 @@ bool AntiRebotePulso(char pull)
     }
     if (lectura == 0) {
       cambio = false;
-      LEC_1 = retorno_false;
+      LEC_1 = retorno_false_1;
     }
     if (lectura == 0xFF) { // otra forma de poner 0b11111111
       cambio = true;
-      LEC_1 = retorno_true;
+      LEC_1 = retorno_true_1;
     }/*
     if(cambio > anterior_cam){
-      LEC = retorno_true;
+      LEC = retorno_true_1;
     }
     if(cambio < anterior_cam){
-      LEC = retorno_false;
+      LEC = retorno_false_1;
     }*/
     anterior_cam = cambio;
     ciclo = 0;
   }
-  //----------------------------------------------------- retorno_true -
-  if (LEC_1 == retorno_true) {
-    LEC_1 = conteo;
+  //----------------------------------------------------- retorno_true_1 -
+  if (LEC_1 == retorno_true_1) {
+    LEC_1 = conteo_1;
     return valorDevuelto = true;
   }
-  //---------------------------------------------------- retorno_false -
-  if (LEC_1 == retorno_false) {
-    LEC_1 = conteo;
+  //---------------------------------------------------- retorno_false_1 -
+  if (LEC_1 == retorno_false_1) {
+    LEC_1 = conteo_1;
     return valorDevuelto = false;
   }
 }
@@ -220,11 +220,11 @@ bool AntiRebotePulso(char pull)
 
 enum LEC_2                                                                   //ANTIREBOTE PUL 2
 {
-  config,
-  conteo,
-  muestreo,
-  retorno_true,
-  retorno_false
+  config_2,
+  conteo_2,
+  muestreo_2,
+  retorno_true_2,
+  retorno_false_2
 };
 
 #define CICLO 5 // cada cuanto se leera el boton
@@ -237,26 +237,27 @@ enum LEC_2                                                                   //A
    @return true
    @return false
 */
-bool AntiRebotePulso(char pull)
+bool AntiRebotePulso_1(char pull)
 {
-  static char LEC_2     = config;
+  static char LEC_2     = config_2;
 
   static uint8_t lectura = 0x00;  // igual a 0b00000000
   static int ciclo = 0;
   static bool valorDevuelto = false;
 
   static bool cambio = false, anterior_cam = false;
-  //----------------------------------------------------- config ----
-  if (LEC_2     == config) {
+  //----------------------------------------------------- config_2 ----
+  if (LEC_2     == config_2) {
     pinMode(pull, INPUT_PULLUP);
     digitalWrite(pull, HIGH);
-    LEC_2     = conteo;
+    LEC_2     = conteo_2
+;
   }
-  //----------------------------------------------------- conteo -----
-  if (LEC_2     == conteo) ciclo++;
-  if (LEC_2     == conteo && ciclo > CICLO) LEC_2     = muestreo;
-  //----------------------------------------------------- muestreo ---
-  if (LEC_2     == muestreo)
+  //----------------------------------------------------- conteo_2 -----
+  if (LEC_2     == conteo_2) ciclo++;
+  if (LEC_2     == conteo_2 && ciclo > CICLO) LEC_2     = muestreo_2;
+  //----------------------------------------------------- muestreo_2 ---
+  if (LEC_2     == muestreo_2)
   {
     lectura = lectura << 1;  // Mover de lugar el bit
     if (digitalRead(pull) == 0) {
@@ -264,29 +265,31 @@ bool AntiRebotePulso(char pull)
     }
     if (lectura == 0) {
       cambio = false;
-      LEC_2     = retorno_false;
+      LEC_2     = retorno_false_2;
     }
     if (lectura == 0xFF) { // otra forma de poner 0b11111111
       cambio = true;
-      LEC_2     = retorno_true;
+      LEC_2     = retorno_true_2;
     }/*
     if(cambio > anterior_cam){
-      LEC = retorno_true;
+      LEC = retorno_true_2;
     }
     if(cambio < anterior_cam){
-      LEC = retorno_false;
+      LEC = retorno_false_2;
     }*/
     anterior_cam = cambio;
     ciclo = 0;
   }
-  //----------------------------------------------------- retorno_true -
-  if (LEC_2     == retorno_true) {
-    LEC_2     = conteo;
+  //----------------------------------------------------- retorno_true_2 -
+  if (LEC_2     == retorno_true_2) {
+    LEC_2     = conteo_2
+;
     return valorDevuelto = true;
   }
-  //---------------------------------------------------- retorno_false -
-  if (LEC_2     == retorno_false) {
-    LEC_2     = conteo;
+  //---------------------------------------------------- retorno_false_2 -
+  if (LEC_2     == retorno_false_2) {
+    LEC_2     = conteo_2
+;
     return valorDevuelto = false;
   }
 }
