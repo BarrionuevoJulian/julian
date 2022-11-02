@@ -22,13 +22,12 @@ void mef(char led, bool pulsador);
 bool AntiRebotePulso(char pull);
 
 void setup(){
-	// Serial.begin(9600);
+	Serial.begin(9600);
 }
 
 void loop()
 {
-    //mef(LED, pulsador);
-	mef(4,AntiRebotePulso (PULSADOR));
+	mef(LED,AntiRebotePulso (PULSADOR));
     delay(1);
 }
 
@@ -100,8 +99,11 @@ bool AntiRebotePulso(char pull)
 		LEC = conteo;
 	}
 //----------------------------------------------------- conteo -----
-	if (LEC == conteo) ciclo++;
 	if (LEC == conteo && ciclo > CICLO) LEC = muestreo;
+	if (LEC == conteo) {
+		ciclo++;
+		LEC = retorno;
+	}
 //----------------------------------------------------- muestreo ---
 	if (LEC == muestreo)
 	{
@@ -115,16 +117,20 @@ bool AntiRebotePulso(char pull)
 		if(lectura == 0xFF){  // otra forma de poner 0b11111111
 			cambio = true;
 		}
+		LEC = retorno;
 		anterior_cam = cambio;
 		ciclo = 0;
 	}
 //----------------------------------------------------- retorno ----
-	if (cambio){
-		LEC = conteo;
-		return true;
+	if (LEC == retorno){
+		if (cambio){
+			LEC = conteo;
+			return true;
+		}
+		if (!cambio){
+			LEC = conteo;
+			return false;
+		}
 	}
-	if (!cambio){
-		LEC = conteo;
-		return false;
-	}
+	
 }
