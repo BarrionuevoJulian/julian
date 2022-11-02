@@ -1,6 +1,6 @@
 // Maquina de estado 2
 
-// #include <Arduino.h>
+#include <Arduino.h>
 #define LED LED_BUILTIN
 #define PULSADOR 8 // pin 8
 
@@ -18,18 +18,17 @@ enum EST
  * @param led Pin del led
  * @param repite Tiempo pren/apagado
  */
-void mef(char led, int pulsador);
+void mef(char led, bool pulsador);
 bool AntiRebotePulso(char pull);
 
 void setup(){
-	Serial.begin(9600);
+	// Serial.begin(9600);
 }
 
 void loop()
 {
-	bool pulsador = AntiRebotePulso (PULSADOR);
-	Serial.println(pulsador);
-    mef(LED, pulsador);
+    //mef(LED, pulsador);
+	mef(4,AntiRebotePulso (PULSADOR));
     delay(1);
 }
 
@@ -72,8 +71,7 @@ enum LEC
 	config,
     conteo,
     muestreo,
-    retorno_true,
-	retorno_false
+    retorno
 };
 
 #define CICLO 5 // cada cuanto se leera el boton
@@ -113,29 +111,20 @@ bool AntiRebotePulso(char pull)
 		}
 		if(lectura == 0){
 			cambio = false;
-			LEC = retorno_false;
 		}
 		if(lectura == 0xFF){  // otra forma de poner 0b11111111
 			cambio = true;
-			LEC = retorno_true;
-		}/*
-		if(cambio > anterior_cam){
-			LEC = retorno_true;
 		}
-		if(cambio < anterior_cam){
-			LEC = retorno_false;
-		}*/
 		anterior_cam = cambio;
 		ciclo = 0;
 	}
-//----------------------------------------------------- retorno_true -
-	if (LEC == retorno_true){
+//----------------------------------------------------- retorno ----
+	if (cambio){
 		LEC = conteo;
-		return valorDevuelto = true;
+		return true;
 	}
-//---------------------------------------------------- retorno_false -
-	if (LEC == retorno_false){
+	if (!cambio){
 		LEC = conteo;
-		return valorDevuelto = false;
+		return false;
 	}
 }
