@@ -1,297 +1,233 @@
-
 // #include <Arduino.h>
 
+#define UNVALOR 25
+#define LIMITE_INF 10
+#define LIMITE_SUP 500
+int frecuencia = 250;
+enum ESTADO 
+{
+  pulso,
+  valorFinal
+};
+int menosMas(bool plMenos, bool plMas, int valor, int moreOrLess, int limInferior, int limSuperior);
+
 #define LED_1 7
+enum ONOFF
+{
+  inicial,
+  prendido,
+  apagado,
+};
+void maquinaFrec(char ledPin, int tiempoT);
+
 #define PUL_1 8
 #define PUL_2 9
-
-enum EST_1
+enum PULL
 {
-  inicial_1,
-  mas_1,
-  menos_1,
-  pulso_1
+	config,
+  conteo,
+  muestreo,
+  retorno
 };
+bool AntiRebotePulso_1(char pulsador);
+bool AntiRebotePulso_2(char pulsador);
 
-enum EST_2
-{
-  inicial_2,
-  mas_2,
-  menos_2,
-  pulso_2
-};
-
-enum ESTADO
-{
-  inicial_3,
-  prendido_3,
-  apagado_3
-};
-
-void mef_PUL_1(int pulsador); //controla pulsador
-void mef_PUL_2(int pulsador); //controla pulsador
-void mef_2(char led, int repite); //controla la frecuencia
-bool AntiRebotePulso(char pull);
-bool AntiRebotePulso_1(char pull);
-
-int frecuencia = 1000;
-
-void setup() {
-  Serial.begin(9600);
-}
+void setup() {}
 
 void loop() {
-  bool pulsador_1 = AntiRebotePulso (PUL_1);
-  bool pulsador_2 = AntiRebotePulso_1 (PUL_2);
-  // Serial.println(pulsador);
-  mef_PUL_1(pulsador_1);
-  mef_PUL_2(pulsador_2);
-  mef_2(LED_1, frecuencia);
+
+  bool pulsador_1 = AntiRebotePulso_1(PUL_1);
+  bool pulsador_2 = AntiRebotePulso_2(PUL_2);
+
+  frecuencia = menosMas(pulsador_1, pulsador_2, frecuencia, UNVALOR, LIMITE_INF, LIMITE_SUP);
+
+  maquinaFrec(LED_1, frecuencia);
+
   delay(1);
-
 }
-void mef_PUL_1(bool pulsar)                                    //control pulsador 1
-{
-  static char EST_1 = inicial_1;
-  static bool bandera = false;
-  static bool onoff;
-  //----------------------------------------------------- inicial ---
-  if (EST_1 == inicial_1)
-  {
-    EST_1 = mas_1;
-    onoff = true;
-  }
-  //----------------------------------------------------- prendido ---
-  if (EST_1 == mas_1) {
-    frecuencia = frecuencia + 100;
-    onoff = true;
-    EST_1 = pulso_1;
-  }
-  //----------------------------------------------------- apagado ---
-  if (EST_1 == menos_1) {
-    onoff = false;
-    EST_1 = pulso_1;
-  }
-  //------------------------------------------------------- pulso ---
-  if (EST_1 == pulso_1) {
-    if (pulsar == true && bandera == false) {
-      if (onoff)EST_1 = menos_1;
-      else EST_1 = mas_1;
-      bandera = true;
-    } else if (!pulsar) bandera = false;
-  }
-}
-void mef_PUL_2(bool pulsar)                                            //control pulsador 2
-{
-  static char EST_2 = inicial_2;
-  static bool bandera = false;
-  static bool onoff;
-  //----------------------------------------------------- inicial ---
-  if (EST_2 == inicial_2)
-  {
-    EST_2 = mas_2;
-    onoff = true;
-  }
-  //----------------------------------------------------- prendido ---
-  if (EST_2 == mas_2) {
 
-    onoff = true;
-    EST_2 = pulso_2;
+/**
+ * @brief Lee dos pulsadores (bool) los cuales aumentaran o disminuiran un "valor" (int)
+ * cada "moreOrLess" (int). Reotrnando un entero (int).
+ * 
+ * @param plMenos Pulsador para menos
+ * @param plMas Pulsador para mas
+ * @param valor Valor inicial de disminucion
+ * @param moreLess Cuanto mas y menos
+ * @param limInferior Limite de disminución
+ * @param limSuperior Limite de aumento
+ * @return int 
+ */
+int menosMas(bool plMenos, bool plMas, int valor, int moreOrLess, int limInferior, int limSuperior)                                            //control pulsador 2
+{
+  static char est = pulso;
+  static bool bandera_1 = false;
+  static bool bandera_2 = false;
+  static int variable = valor;
+//------------------------------------------------------- pulso ---
+  if (est == pulso) {
+    /* Pulsa, plmenos disminulle "moreOrLess" */
+    if (plMenos == true && bandera_1 == false) {
+      variable += moreOrLess;
+      if (variable >= limSuperior) variable = limSuperior;
+      bandera_1 = true;
+    } else if (!plMenos) bandera_1 = false;
+    /* Pulsa, plmas aumenta "moreOrLess"      */
+    if (plMas == true && bandera_2 == false) {
+      variable -= moreOrLess;
+      if (variable <= limInferior) variable = limInferior;
+      bandera_2 = true;
+    } else if (!plMas) bandera_2 = false;
+    /* Reseteammos el estado a valorFinal */
+    est = valorFinal;
   }
-  //----------------------------------------------------- apagado ---
-  if (EST_2 == menos_2) {
-    frecuencia = frecuencia - 100;
-    onoff = false;
-    EST_2 = pulso_2;
-  }
-  //------------------------------------------------------- pulso ---
-  if (EST_2 == pulso_2) {
-    if (pulsar == true && bandera == false) {
-      if (onoff)EST_2 = menos_2;
-      else EST_2 = mas_2;
-      bandera = true;
-    } else if (!pulsar) bandera = false;
+//------------------------------------------------- valorFinal ---
+  if (est == valorFinal){
+    est = pulso;
+    return variable;
   }
 }
-void mef_2(char led, int repite)                                     //CONTROL FRECUENCIA
-{
-  static int contador = repite;
-  static char ESTADO = inicial_3;
 
+/**
+ * @brief Controla la Frecuencia del led.
+ * Prende apaga un led con periodos ton y off iguales de valor "frecuencia".
+ * 
+ * @param led Pin del led
+ * @param tiempoT Tiempo de ton y toff
+ */
+void maquinaFrec (char led, int tiempoT)     // CONTROL FRECUENCIA
+{
+  static char onoff = inicial;
+  static int contador = tiempoT;
   //----------------------------------------------------- inicial ---
-  if (ESTADO == inicial_3)
+  if (onoff == inicial)
   {
     pinMode(led, OUTPUT);
-    contador = repite;
-    ESTADO = prendido_3;
+    contador = tiempoT;
+    onoff = prendido;
     digitalWrite(led, HIGH);
   }
   //----------------------------------------------------- prendido ---
-  if (ESTADO == prendido_3 && contador <= 0)
+  if (onoff == prendido && contador <= 0)
   {
     digitalWrite(led, LOW);
-    contador = repite;
-    ESTADO = apagado_3;
+    contador = tiempoT;
+    onoff = apagado;
   }
-  if (ESTADO == prendido_3)contador--;
+  if (onoff == prendido) contador--;
   //----------------------------------------------------- apagado ---
-  if (ESTADO == apagado_3 && contador > 0)
+  if (onoff == apagado && contador > 0)
   {
     digitalWrite(led, HIGH);
-    contador = repite;
-    ESTADO = prendido_3;
+    contador = tiempoT;
+    onoff = prendido;
   }
-  if (ESTADO == prendido_3)contador--;
+  if (onoff == prendido) contador--;
 }
-
-enum LEC_1                                                        //ANTIREBOTE PUL 1
-{
-  config_1,
-  conteo_1,
-  muestreo_1,
-  retorno_true_1,
-  retorno_false_1
-};
 
 #define CICLO 5 // cada cuanto se leera el boton
 
 /**
-   @brief Lee pulsador y devuelve sin rebote.
-   muestro del mismo cada CICLOS ms.
-
-   @param pull Pin del pulsador
-   @return true
-   @return false
-*/
-bool AntiRebotePulso(char pull)
+ * @brief Antirebote de un pulsador. Retorna pulso sin rebote con true y false 
+ * 
+ * @param pulsador Pin del pulsador
+ * @return true Pulsando
+ * @return false Sin pulsar
+ */
+bool AntiRebotePulso_1(char pulsador)
 {
-  static char LEC_1 = config_1;
+  static char pull_1 = config;
 
   static uint8_t lectura = 0x00;  // igual a 0b00000000
   static int ciclo = 0;
-  static bool valorDevuelto = false;
 
-  static bool cambio = false, anterior_cam = false;
-  //----------------------------------------------------- config_1 ----
-  if (LEC_1 == config_1) {
-    pinMode(pull, INPUT_PULLUP);
-    digitalWrite(pull, HIGH);
-    LEC_1 = conteo_1;
-  }
-  //----------------------------------------------------- conteo_1 -----
-  if (LEC_1 == conteo_1) ciclo++;
-  if (LEC_1 == conteo_1 && ciclo > CICLO) LEC_1 = muestreo_1;
-  //----------------------------------------------------- muestreo_1 ---
-  if (LEC_1 == muestreo_1)
-  {
-    lectura = lectura << 1;  // Mover de lugar el bit
-    if (digitalRead(pull) == 0) {
-      lectura = lectura | 1;
-    }
-    if (lectura == 0) {
-      cambio = false;
-      LEC_1 = retorno_false_1;
-    }
-    if (lectura == 0xFF) { // otra forma de poner 0b11111111
-      cambio = true;
-      LEC_1 = retorno_true_1;
-    }/*
-    if(cambio > anterior_cam){
-      LEC = retorno_true_1;
-    }
-    if(cambio < anterior_cam){
-      LEC = retorno_false_1;
-    }*/
-    anterior_cam = cambio;
-    ciclo = 0;
-  }
-  //----------------------------------------------------- retorno_true_1 -
-  if (LEC_1 == retorno_true_1) {
-    LEC_1 = conteo_1;
-    return valorDevuelto = true;
-  }
-  //---------------------------------------------------- retorno_false_1 -
-  if (LEC_1 == retorno_false_1) {
-    LEC_1 = conteo_1;
-    return valorDevuelto = false;
-  }
+  static bool cambio = false;
+  //----------------------------------------------------- config ----
+	if (pull_1 == config){
+		pinMode(pulsador, INPUT_PULLUP);
+		digitalWrite(pulsador, HIGH);
+		pull_1 = conteo;
+	}
+//----------------------------------------------------- conteo -----
+	if (pull_1 == conteo && ciclo > CICLO) pull_1 = muestreo;
+	if (pull_1 == conteo) {
+		ciclo++;
+		pull_1 = retorno;
+	}
+//----------------------------------------------------- muestreo ---
+	if (pull_1 == muestreo)
+	{
+		lectura = lectura << 1;  // Mover de lugar el bit
+		if (digitalRead(pulsador) == 0){
+			lectura = lectura | 1;
+		}
+		if(lectura == 0){
+			cambio = false;
+		}
+		if(lectura == 0xFF){  // otra forma de poner 0b11111111
+			cambio = true;
+		}
+		pull_1 = retorno;
+		ciclo = 0;
+	}
+//----------------------------------------------------- retorno ----
+	if (pull_1 == retorno){
+		if (cambio){
+			pull_1 = conteo;
+			return true;
+		}
+		if (!cambio){
+			pull_1 = conteo;
+			return false;
+		}
+	}
 }
 
-
-enum LEC_2                                                                   //ANTIREBOTE PUL 2
+bool AntiRebotePulso_2(char pulsador)
 {
-  config_2,
-  conteo_2,
-  muestreo_2,
-  retorno_true_2,
-  retorno_false_2
-};
-
-#define CICLO 5 // cada cuanto se leera el boton
-
-/**
-   @brief Lee pulsador y devuelve sin rebote.
-   muestro del mismo cada CICLOS ms.
-
-   @param pull Pin del pulsador
-   @return true
-   @return false
-*/
-bool AntiRebotePulso_1(char pull)
-{
-  static char LEC_2     = config_2;
+  static char pull_2 = config;
 
   static uint8_t lectura = 0x00;  // igual a 0b00000000
   static int ciclo = 0;
-  static bool valorDevuelto = false;
 
-  static bool cambio = false, anterior_cam = false;
-  //----------------------------------------------------- config_2 ----
-  if (LEC_2     == config_2) {
-    pinMode(pull, INPUT_PULLUP);
-    digitalWrite(pull, HIGH);
-    LEC_2     = conteo_2
-;
-  }
-  //----------------------------------------------------- conteo_2 -----
-  if (LEC_2     == conteo_2) ciclo++;
-  if (LEC_2     == conteo_2 && ciclo > CICLO) LEC_2     = muestreo_2;
-  //----------------------------------------------------- muestreo_2 ---
-  if (LEC_2     == muestreo_2)
-  {
-    lectura = lectura << 1;  // Mover de lugar el bit
-    if (digitalRead(pull) == 0) {
-      lectura = lectura | 1;
-    }
-    if (lectura == 0) {
-      cambio = false;
-      LEC_2     = retorno_false_2;
-    }
-    if (lectura == 0xFF) { // otra forma de poner 0b11111111
-      cambio = true;
-      LEC_2     = retorno_true_2;
-    }/*
-    if(cambio > anterior_cam){
-      LEC = retorno_true_2;
-    }
-    if(cambio < anterior_cam){
-      LEC = retorno_false_2;
-    }*/
-    anterior_cam = cambio;
-    ciclo = 0;
-  }
-  //----------------------------------------------------- retorno_true_2 -
-  if (LEC_2     == retorno_true_2) {
-    LEC_2     = conteo_2
-;
-    return valorDevuelto = true;
-  }
-  //---------------------------------------------------- retorno_false_2 -
-  if (LEC_2     == retorno_false_2) {
-    LEC_2     = conteo_2
-;
-    return valorDevuelto = false;
-  }
+  static bool cambio = false;
+  //----------------------------------------------------- config ----
+	if (pull_2 == config){
+		pinMode(pulsador, INPUT_PULLUP);
+		digitalWrite(pulsador, HIGH);
+		pull_2 = conteo;
+	}
+//----------------------------------------------------- conteo -----
+	if (pull_2 == conteo && ciclo > CICLO) pull_2 = muestreo;
+	if (pull_2 == conteo) {
+		ciclo++;
+		pull_2 = retorno;
+	}
+//----------------------------------------------------- muestreo ---
+	if (pull_2 == muestreo)
+	{
+		lectura = lectura << 1;  // Mover de lugar el bit
+		if (digitalRead(pulsador) == 0){
+			lectura = lectura | 1;
+		}
+		if(lectura == 0){
+			cambio = false;
+		}
+		if(lectura == 0xFF){  // otra forma de poner 0b11111111
+			cambio = true;
+		}
+		pull_2 = retorno;
+		ciclo = 0;
+	}
+//----------------------------------------------------- retorno ----
+	if (pull_2 == retorno){
+		if (cambio){
+			pull_2 = conteo;
+			return true;
+		}
+		if (!cambio){
+			pull_2 = conteo;
+			return false;
+		}
+	}
 }
-
-// enum preguntar como mejorarlo el tema de no repetir muchos;
