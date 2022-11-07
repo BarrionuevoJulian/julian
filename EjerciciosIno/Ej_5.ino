@@ -4,31 +4,31 @@
 #define LIMITE_INF 10
 #define LIMITE_SUP 500
 int frecuencia = 250;
-enum ESTADO 
+typedef enum estado
 {
   pulso,
   valorFinal
-};
+} ESTADO;
 int menosMas(bool plMenos, bool plMas, int valor, int moreOrLess, int limInferior, int limSuperior);
 
 #define LED_1 7
-enum ONOFF
+typedef enum onoff
 {
   inicial,
   prendido,
-  apagado,
-};
+  apagado
+} ONOFF;
 void maquinaFrec(char ledPin, int tiempoT);
 
 #define PUL_1 8
 #define PUL_2 9
-enum PULL
+typedef enum pull
 {
 	config,
   conteo,
   muestreo,
   retorno
-};
+} PULL;
 bool AntiRebotePulso_1(char pulsador);
 bool AntiRebotePulso_2(char pulsador);
 
@@ -60,7 +60,7 @@ void loop() {
  */
 int menosMas(bool plMenos, bool plMas, int valor, int moreOrLess, int limInferior, int limSuperior)                                            //control pulsador 2
 {
-  static char est = pulso;
+  static ESTADO est = pulso;
   static bool bandera_1 = false;
   static bool bandera_2 = false;
   static int variable = valor;
@@ -97,7 +97,7 @@ int menosMas(bool plMenos, bool plMas, int valor, int moreOrLess, int limInferio
  */
 void maquinaFrec (char led, int tiempoT)     // CONTROL FRECUENCIA
 {
-  static char onoff = inicial;
+  static ONOFF onoff = inicial;
   static int contador = tiempoT;
   //----------------------------------------------------- inicial ---
   if (onoff == inicial)
@@ -136,13 +136,13 @@ void maquinaFrec (char led, int tiempoT)     // CONTROL FRECUENCIA
  */
 bool AntiRebotePulso_1(char pulsador)
 {
-  static char pull_1 = config;
+  static PULL pull_1 = config;
 
   static uint8_t lectura = 0x00;  // igual a 0b00000000
   static int ciclo = 0;
 
   static bool cambio = false;
-  //----------------------------------------------------- config ----
+  //---------------------------------------------------- config ----
 	if (pull_1 == config){
 		pinMode(pulsador, INPUT_PULLUP);
 		digitalWrite(pulsador, HIGH);
@@ -185,7 +185,7 @@ bool AntiRebotePulso_1(char pulsador)
 
 bool AntiRebotePulso_2(char pulsador)
 {
-  static char pull_2 = config;
+  static PULL pull_2 = config;
 
   static uint8_t lectura = 0x00;  // igual a 0b00000000
   static int ciclo = 0;
