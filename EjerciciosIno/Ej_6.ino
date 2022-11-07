@@ -1,9 +1,16 @@
-// #include <Arduino.h>
+#define LED 7
+enum BRILLO
+{
+    inicial,
+    prendido,
+	apagado
+};
+void brilloLeds(char led, int brillo);
 
-#define UNVALOR 25
-#define LIMITE_INF 10
-#define LIMITE_SUP 500
-int frecuencia = 250;
+#define UNVALOR 10
+#define LIMITE_INF 0
+#define LIMITE_SUP 100
+int frecuencia = 50;
 enum ESTADO 
 {
   pulso,
@@ -11,20 +18,11 @@ enum ESTADO
 };
 int menosMas(bool plMenos, bool plMas, int valor, int moreOrLess, int limInferior, int limSuperior);
 
-#define LED_1 7
-enum ONOFF
-{
-  inicial,
-  prendido,
-  apagado,
-};
-void maquinaFrec(char ledPin, int tiempoT);
-
 #define PUL_1 8
 #define PUL_2 9
 enum PULL
 {
-	config,
+  config,
   conteo,
   muestreo,
   retorno
@@ -41,9 +39,49 @@ void loop() {
 
   frecuencia = menosMas(pulsador_1, pulsador_2, frecuencia, UNVALOR, LIMITE_INF, LIMITE_SUP);
 
-  maquinaFrec(LED_1, frecuencia);
+  brilloLeds (LED, frecuencia);
 
   delay(1);
+}
+
+/**
+ * @brief Brillo de un led en PWM con periodo de 20 m.
+ * 
+ * @param led Pin del led.
+ * @param brillo escala de brillo de 0 a 10.
+ */
+void brilloLeds(char led ,int brillo )
+{
+    static BRILLO est_1 = inicial;
+    static int contador = 0;
+    static bool bandera = false;
+//----------------------------------------------------- inicial ---
+    if (est_1 == inicial){
+        pinMode(led, OUTPUT);
+		digitalWrite(led, prendido);
+        est_1 = prendido;
+    }
+//----------------------------------------------------- prendido --
+    if (est_1 == prendido){
+        // si la bandera es verdadera y contador mayor igual a parada
+        if(contador >= brillo && bandera){
+            digitalWrite(led, LOW);
+			est_1 = apagado;
+            bandera = false;
+		}
+	}
+//----------------------------------------------------- apagado ---
+	if (est_1 == apagado){
+		// si la bandera es false y contador menor a parada
+		if (contador < brillo && !bandera){
+			digitalWrite(led, HIGH);
+			est_1 = prendido;
+			bandera = true;
+		}
+	}
+    // contador vuelve a resetear el periodo
+    if(contador > 10) contador = 0;
+    contador++;
 }
 
 /**
@@ -86,43 +124,6 @@ int menosMas(bool plMenos, bool plMas, int valor, int moreOrLess, int limInferio
     est = pulso;
     return variable;
   }
-}
-
-/**
- * @brief Controla la Frecuencia del led.
- * Prende apaga un led con periodos ton y off iguales de valor "frecuencia".
- * 
- * @param led Pin del led
- * @param tiempoT Tiempo de ton y toff
- */
-void maquinaFrec (char led, int tiempoT)     // CONTROL FRECUENCIA
-{
-  static char onoff = inicial;
-  static int contador = tiempoT;
-  //----------------------------------------------------- inicial ---
-  if (onoff == inicial)
-  {
-    pinMode(led, OUTPUT);
-    contador = tiempoT;
-    onoff = prendido;
-    digitalWrite(led, HIGH);
-  }
-  //----------------------------------------------------- prendido ---
-  if (onoff == prendido && contador <= 0)
-  {
-    digitalWrite(led, LOW);
-    contador = tiempoT;
-    onoff = apagado;
-  }
-  if (onoff == prendido) contador--;
-  //----------------------------------------------------- apagado ---
-  if (onoff == apagado && contador > 0)
-  {
-    digitalWrite(led, HIGH);
-    contador = tiempoT;
-    onoff = prendido;
-  }
-  if (onoff == prendido) contador--;
 }
 
 #define CICLO 5 // cada cuanto se leera el boton

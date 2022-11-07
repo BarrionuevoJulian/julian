@@ -12,10 +12,7 @@ enum ESTADO
 void brilloLeds_1( char led , int brillo );
 void brilloLeds_2( char led , int brillo );
 
-void setup()
-{
-    
-}
+void setup(){}
 
 void loop()
 {
@@ -30,7 +27,7 @@ void loop()
  * @param led Pin del led.
  * @param brillo escala de brillo de 0 a 10.
  */
-void brilloLeds( char led , int brillo )
+void brilloLeds_1( char led , int brillo )
 {
     static ESTADO est_1 = inicial;
     static int contador = 0;
@@ -70,7 +67,7 @@ void brilloLeds( char led , int brillo )
  * @param led Pin del led.
  * @param brillo escala de brillo de 0 a 10.
  */
-void brilloLeds( char led , int brillo )
+void brilloLeds_2( char led , int brillo )
 {
     static ESTADO est_2 = inicial;
     static int contador = 0;
