@@ -1,5 +1,5 @@
 {
-    "sketch": "Ej_1.ino",
+    "sketch": "EjerciciosIno\\Ej_6.ino",
     "output": "build",
     "board": "arduino:avr:uno",
     "programmer": "arduino:avrispmkii"
