@@ -1,7 +1,7 @@
 // Maquina de estado 2
 
 #include <Arduino.h>
-#define LED LED_BUILTIN
+#define LED 2 //LED_BUILTIN
 #define PULSADOR 8 // pin 8
 
 enum EST
@@ -56,13 +56,15 @@ void mef(char led, bool pulsar)
 		EST = pulso;
 	}
 //------------------------------------------------------- pulso ---
-	if (EST == pulso){
-		if (pulsar == true && bandera == false){
-			if (onoff) EST = apagado;
-			else EST = prendido;
-			bandera = true;
-		} else if (!pulsar) bandera = false;
+	if (EST == pulso && pulsar && !bandera && onoff) {
+		 EST == apagado;
+		 bandera = true;
 	}
+	if (EST == pulso && pulsar && !bandera && !onoff) {
+		 EST == prendido;
+		 bandera = true;
+	}
+	if (EST == pulso && !pulsar) bandera = false;
 }
 
 enum LEC
