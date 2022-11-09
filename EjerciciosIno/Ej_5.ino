@@ -1,9 +1,12 @@
+/*Begining of Auto generated code by Atmel studio */
+#include <Arduino.h>
+
 // #include <Arduino.h>
 
-#define UNVALOR 25
-#define LIMITE_INF 10
-#define LIMITE_SUP 500
-int frecuencia = 250;
+#define UNVALOR 200
+#define LIMITE_INF 0
+#define LIMITE_SUP 1000
+int frecuencia = 500;
 enum ESTADO 
 {
   pulso,
@@ -11,7 +14,7 @@ enum ESTADO
 };
 int menosMas(bool plMenos, bool plMas, int valor, int moreOrLess, int limInferior, int limSuperior);
 
-#define LED_1 7
+#define LED_1 2
 enum ONOFF
 {
   inicial,
@@ -116,13 +119,13 @@ void maquinaFrec (char led, int tiempoT)     // CONTROL FRECUENCIA
   }
   if (onoff == prendido) contador--;
   //----------------------------------------------------- apagado ---
-  if (onoff == apagado && contador > 0)
+  if (onoff == apagado && contador <= 0)
   {
     digitalWrite(led, HIGH);
     contador = tiempoT;
-    onoff = prendido;
+    onoff = inicial;
   }
-  if (onoff == prendido) contador--;
+  if (onoff == apagado) contador--;
 }
 
 #define CICLO 5 // cada cuanto se leera el boton
